@@ -22,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -148,8 +149,12 @@ public class AuthenticationController {
         }
     }
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/editrole/{id}",method = RequestMethod.GET)
-    public ResponseEntity<UserDTO> editRole(@PathVariable Integer id){
+    @RequestMapping(value = "/editrole/{id}",method = RequestMethod.PUT)
+    public ResponseEntity<UserDTO> editRole(@PathVariable Integer id,
+                                            @Validated @RequestBody UserDTO userDTO){
+        if(!id.equals(userDTO.getId())){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         Authority authority;
         User user = userServiceIterface.findOne(id);
         if(user==null){
